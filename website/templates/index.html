@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="id" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Face Expression Classifier · YOLOv8</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,600;1,9..144,300;1,9..144,400&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+</head>
+<body>
+<div class="grain"></div>
+<div id="ambient-glow"></div>
+
+<button class="theme-toggle" onclick="toggleTheme()" id="theme-btn">
+  <span id="theme-icon">🌙</span>
+  <span id="theme-label">MALAM</span>
+</button>
+
+<div class="container">
+  <header>
+    <div class="status-pill">
+      <div class="status-dot"></div>
+      YOLOv8 · aktif
+    </div>
+    <h1>Face <em>Expression</em><br>Classifier</h1>
+    <p class="subtitle">Unggah gambar wajah — model YOLOv8 akan mendeteksi dan mengklasifikasi ekspresi secara otomatis dengan skor kepercayaan.</p>
+  </header>
+
+  <div class="grid">
+    
+    <div>
+      <div class="section-label"><div class="section-label-line"></div><span>Input Gambar</span></div>
+      <div class="upload-zone" id="upload-zone" ondragover="onDragOver(event)" ondragleave="onDragLeave(event)" ondrop="onDrop(event)" onclick="onZoneClick()">
+        <div class="upload-empty" id="upload-empty">
+          <div class="upload-icon-box"><svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg></div>
+          <div class="upload-text"><p id="upload-hint">Seret &amp; lepas gambar</p><small>atau klik untuk memilih file</small></div>
+        </div>
+        <div class="preview-wrap hidden" id="preview-wrap">
+          <img id="preview-img" src="" alt="Uploaded face" />
+          <div class="scan-line hidden" id="scan-line"></div>
+          <div class="scan-overlay hidden" id="scan-overlay">
+            <div class="scan-icon-wrap"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7V5a2 2 0 0 1 2-2h2"/><path d="M17 3h2a2 2 0 0 1 2 2v2"/><path d="M21 17v2a2 2 0 0 1-2 2h-2"/><path d="M7 21H5a2 2 0 0 1-2-2v-2"/><circle cx="12" cy="12" r="3"/></svg></div>
+            <div class="scan-label"><p>MENGANALISIS</p><small>Inferensi YOLOv8 berjalan…</small></div>
+          </div>
+          <div class="done-badge hidden" id="done-badge">selesai</div>
+        </div>
+      </div>
+      <input type="file" id="file-input" accept="image/*" class="hidden" onchange="onFileInput(event)" />
+      
+      <div class="progress-box hidden" id="progress-box">
+        <div class="progress-header"><span>INFERENSI YOLOV8</span><span class="pct" id="progress-pct">0%</span></div>
+        <div class="progress-track"><div class="progress-fill" id="progress-fill"></div></div>
+      </div>
+
+      <div class="btn-row hidden" id="btn-row">
+        <button class="btn btn-ghost" onclick="handleReset()">Reset</button>
+        <button class="btn btn-primary" onclick="document.getElementById('file-input').click()">Ganti Gambar</button>
+      </div>
+    </div>
+
+    
+    <div>
+      <div class="section-label"><div class="section-label-line"></div><span>Hasil Klasifikasi</span></div>
+      <div class="idle-panel" id="idle-panel">
+        <div class="idle-text"><p>Belum ada gambar</p><small>Unggah gambar wajah untuk memulai deteksi</small></div>
+      </div>
+
+      <div class="hidden" id="results-panel">
+        <div class="dominant-banner" id="dominant-banner">
+          <div style="position:absolute;inset:0;pointer-events:none;border-radius:20px;overflow:hidden" id="banner-bg-layer"></div>
+          <div class="dominant-label">EKSPRESI DOMINAN</div>
+          <div class="dominant-main">
+            <span class="dominant-emoji" id="dom-emoji"></span>
+            <div><div class="dominant-name" id="dom-name"></div><div class="dominant-en" id="dom-en"></div></div>
+            <div class="dominant-score"><div class="dominant-pct" id="dom-pct"></div><div class="dominant-pct-label">KEPERCAYAAN</div></div>
+          </div>
+        </div>
+
+        <div class="bars-panel">
+          <div class="bars-title">SKOR KEPERCAYAAN — SEMUA KELAS</div>
+          <div id="bars-container"></div>
+        </div>
+        
+        <div class="model-info">
+          <div class="model-grid">
+            <div><div class="model-item-label">MODEL</div><div class="model-item-val">YOLOv8</div></div>
+            <div><div class="model-item-label">KELAS</div><div class="model-item-val">3</div></div>
+            <div><div class="model-item-label">STATUS</div><div class="model-item-val" style="color:var(--green)">OK</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer><p>FACE EXPRESSION CLASSIFIER · YOLOV8 · SENANG · SEDIH · MARAH</p></footer>
+</div>
+
+<script>
+  const EMOTIONS_LIGHT = [
+    { key:'happy', label:'Senang', en:'HAPPY', emoji:'😊', color:'#c47a00', glow:'rgba(196,122,0,0.18)', barBg:'rgba(196,122,0,0.12)', barFill:'linear-gradient(90deg,#e0a030,#c47a00)' },
+    { key:'sad',   label:'Sedih',  en:'SAD',   emoji:'😢', color:'#2a6aaf', glow:'rgba(42,106,175,0.18)', barBg:'rgba(42,106,175,0.10)', barFill:'linear-gradient(90deg,#5a9ad0,#2a6aaf)' },
+    { key:'angry', label:'Marah',  en:'ANGRY', emoji:'😠', color:'#b02038', glow:'rgba(176,32,56,0.18)', barBg:'rgba(176,32,56,0.10)', barFill:'linear-gradient(90deg,#d05068,#b02038)' },
+  ];
+  const EMOTIONS_DARK = [
+    { key:'happy', label:'Senang', en:'HAPPY', emoji:'😊', color:'#f0b040', glow:'rgba(240,176,64,0.2)', barBg:'rgba(240,176,64,0.1)', barFill:'linear-gradient(90deg,#f8d080,#f0b040)' },
+    { key:'sad',   label:'Sedih',  en:'SAD',   emoji:'😢', color:'#6aaae0', glow:'rgba(106,170,224,0.2)', barBg:'rgba(106,170,224,0.1)', barFill:'linear-gradient(90deg,#90c8f0,#6aaae0)' },
+    { key:'angry', label:'Marah',  en:'ANGRY', emoji:'😠', color:'#e06070', glow:'rgba(224,96,112,0.2)', barBg:'rgba(224,96,112,0.1)', barFill:'linear-gradient(90deg,#f090a0,#e06070)' },
+  ];
+  function getEmotions() { return document.documentElement.getAttribute('data-theme') === 'dark' ? EMOTIONS_DARK : EMOTIONS_LIGHT; }
+
+  function applyTheme(theme) {
+    document.documentElement.setAttribute('data-theme', theme);
+    document.getElementById('theme-icon').textContent = theme === 'light' ? '🌙' : '☀️';
+    document.getElementById('theme-label').textContent = theme === 'light' ? 'MALAM' : 'SIANG';
+  }
+  function toggleTheme() { applyTheme(document.documentElement.getAttribute('data-theme') === 'light' ? 'dark' : 'light'); }
+  applyTheme('light');
+
+  let appState = 'idle';
+  let progressInterval = null;
+  let progressValue = 0;
+  let currentFile = null;
+
+  function setState(state) {
+    appState = state;
+    const hasImage = state !== 'idle';
+    document.getElementById('upload-zone').classList.toggle('has-image', hasImage);
+    document.getElementById('upload-empty').classList.toggle('hidden', hasImage);
+    document.getElementById('preview-wrap').classList.toggle('hidden', !hasImage);
+    document.getElementById('scan-line').classList.toggle('hidden', state !== 'scanning');
+    document.getElementById('scan-overlay').classList.toggle('hidden', state !== 'scanning');
+    document.getElementById('done-badge').classList.toggle('hidden', state !== 'done');
+    document.getElementById('progress-box').classList.toggle('hidden', state !== 'scanning');
+    document.getElementById('btn-row').classList.toggle('hidden', !hasImage || state === 'scanning');
+    document.getElementById('idle-panel').classList.toggle('hidden', state !== 'idle');
+    document.getElementById('results-panel').classList.toggle('hidden', state !== 'done');
+  }
+
+  function handleFile(file) {
+    if (!file || !file.type.startsWith('image/')) return;
+    currentFile = file;
+    document.getElementById('preview-img').src = URL.createObjectURL(file);
+    startScanning();
+  }
+  function onFileInput(e) { handleFile(e.target.files[0]); }
+  function onZoneClick() { if (appState === 'idle') document.getElementById('file-input').click(); }
+  function onDragOver(e) { e.preventDefault(); document.getElementById('upload-zone').classList.add('dragging'); }
+  function onDragLeave() { document.getElementById('upload-zone').classList.remove('dragging'); }
+  function onDrop(e) { e.preventDefault(); document.getElementById('upload-zone').classList.remove('dragging'); handleFile(e.dataTransfer.files[0]); }
+
+  function setProgress(val) {
+    document.getElementById('progress-fill').style.width = val + '%';
+    document.getElementById('progress-pct').textContent = Math.round(val) + '%';
+  }
+
+  async function startScanning() {
+    setState('scanning');
+    progressValue = 10; setProgress(10);
+    progressInterval = setInterval(() => {
+      progressValue += Math.random() * 5;
+      if (progressValue < 90) setProgress(progressValue);
+    }, 200);
+
+    const formData = new FormData();
+    formData.append('image', currentFile);
+
+    try {
+      const res = await fetch('/predict', { method: 'POST', body: formData });
+      const data = await res.json();
+      
+      clearInterval(progressInterval);
+      setProgress(100);
+
+      if (!res.ok) {
+        alert("Error: " + (data.error || "Gagal memproses gambar"));
+        handleReset();
+        return;
+      }
+
+      setTimeout(() => finishScanning(data.scores), 400);
+    } catch (e) {
+      clearInterval(progressInterval);
+      alert("Error: Gagal menghubungi server Python.");
+      handleReset();
+    }
+  }
+
+  function finishScanning(scores) {
+    const emotions = getEmotions();
+    const results = emotions.map(e => ({ ...e, confidence: scores[e.key] })).sort((a,b) => b.confidence - a.confidence);
+    renderResults(results);
+    setState('done');
+    setAmbientGlow(results[0].glow);
+  }
+
+  function renderResults(results) {
+    const top = results[0];
+    const banner = document.getElementById('dominant-banner');
+    banner.style.background = `linear-gradient(135deg, ${top.glow.replace(/[\d.]+\)$/, '0.18)')}, ${top.glow.replace(/[\d.]+\)$/, '0.06)')})`;
+    banner.style.border = `1px solid ${top.glow.replace(/[\d.]+\)$/, '0.3)')}`;
+    document.getElementById('banner-bg-layer').style.background = `radial-gradient(ellipse at top right, ${top.glow} 0%, transparent 65%)`;
+
+    document.getElementById('dom-emoji').textContent = top.emoji;
+    document.getElementById('dom-name').textContent = top.label;
+    document.getElementById('dom-name').style.color = top.color;
+    document.getElementById('dom-en').textContent = top.en;
+    document.getElementById('dom-pct').innerHTML = (top.confidence * 100).toFixed(1) + '<sup>%</sup>';
+    document.getElementById('dom-pct').style.color = top.color;
+
+    const container = document.getElementById('bars-container');
+    container.innerHTML = '';
+    results.forEach((r, i) => {
+      const isTop = i === 0;
+      const item = document.createElement('div');
+      item.className = 'bar-item';
+      item.innerHTML = `
+        <div class="bar-header">
+          <div class="bar-left">
+            <span class="bar-emoji">${r.emoji}</span>
+            <div><div class="bar-en" style="color:${r.color}">${r.en}</div><div class="bar-name">${r.label}</div></div>
+            ${isTop ? `<span class="bar-dominant-badge" style="color:${r.color};border-color:${r.color};background:${r.barBg}">dominan</span>` : ''}
+          </div>
+          <div class="bar-pct" style="color:${r.color}">${(r.confidence * 100).toFixed(1)}%</div>
+        </div>
+        <div class="bar-track" style="background:${r.barBg}">
+          <div class="bar-fill" id="bf-${r.key}" style="background:${r.barFill}${isTop?`;box-shadow:0 0 8px ${r.glow}`:''}"></div>
+        </div>
+      `;
+      container.appendChild(item);
+      setTimeout(() => { document.getElementById('bf-' + r.key).style.width = (r.confidence * 100) + '%'; }, i * 180 + 60);
+    });
+  }
+
+  function setAmbientGlow(color) {
+    const el = document.getElementById('ambient-glow');
+    el.style.background = `radial-gradient(ellipse at top right, ${color} 0%, transparent 65%)`;
+    el.style.opacity = '1';
+  }
+
+  function handleReset() {
+    if (progressInterval) clearInterval(progressInterval);
+    setState('idle');
+    document.getElementById('preview-img').src = '';
+    document.getElementById('file-input').value = '';
+    document.getElementById('ambient-glow').style.opacity = '0';
+  }
+</script>
+</body>
+</html>
