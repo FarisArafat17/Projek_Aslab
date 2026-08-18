@@ -24,11 +24,12 @@ Model YOLOv8 yang sudah jadi akan dimasukkan ke dalam website
 
 #### Kurva Hasil Training dan Confusion Matrix
 <br>
-<img width="2400" height="1200" alt="output" src="https://github.com/user-attachments/assets/0fcb8be0-18d9-483a-94f2-4047961245e8" />
+<img width="495" height="555" alt="Screenshot 2026-08-18 135804" src="https://github.com/user-attachments/assets/4f4ae729-5e4c-43a2-bbd4-36abed507361" />
 <br>
-<img width="495" height="555" alt="Screenshot 2026-08-18 135804" src="https://github.com/user-attachments/assets/59296e54-7c7b-4564-b5dd-dea27271564a" />
+<img width="2400" height="1200" alt="output" src="https://github.com/user-attachments/assets/74c6cf9a-6760-434d-a952-aadccb587562" />
+
 
 
 #### Flowchart dari cara kerja websitenya
 <br>
-<img width="541" height="792" alt="Untitled Diagram drawio (5)" src="https://github.com/user-attachments/assets/b7b4aeef-728c-4256-b194-0b6b5b274fad" />
+<img width="541" height="792" alt="Untitled Diagram drawio (5)" src="https://github.com/user-attachments/assets/402eef37-2812-41f4-a161-f192fda13890" />
