@@ -2,24 +2,24 @@
 
 ### Alur Projek (CRISP-DM)
 
-### 1. Pemahaman Bisnis (Business Understanding)
+### 1. Business Understanding
 Tujuan utama dari proyek ini adalah membuat model AI yang dapat mengidentifikasi Ekspresi Wajah Manusia
 
-### 2. Pemahaman Data (Data Understanding)
+### 2. Data Understanding
 * **Sumber Data:** Kumpulan gambar wajah manusia yang dikumpulkan dari [Roboflow](https://universe.roboflow.com/emotions-dectection/human-face-emotions)
 * **Anotasi:** Setiap gambar di dalam dataset sudah terdapat *bounding box*
 
-### 3. Persiapan Data (Data Preparation)
+### 3. Data Preparation
 Data akan diambil hanya anger, sad dan happy, lalu akan diproses dengan dilakukan splitting datanya
 
-### 4. Pemodelan (Modeling)
+### 4. Modeling
 * **Arsitektur Utama:** YOLOv8
 * **Pelatihan:** Model akan melalui pelatihan awal yakni fine-tuning untuk mencari kombinasi terbaik dan hasil fine tuning akan digunakan pada training akhir
 
-### 5. Evaluasi (Evaluation)
+### 5. Evaluation
 Setelah proses pelatihan selesai, model akan memasuki proses TTA untuk memaksimalkan validasi dari modelnya dan akan diperlihatkan juga hasil evaluasianya
 
-### 6. Penyebaran (Deployment)
+### 6. Deployment
 Model YOLOv8 yang sudah jadi akan dimasukkan ke dalam website
 
 #### Kurva Hasil Training dan Confusion Matrix
